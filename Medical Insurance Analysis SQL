@@ -1,0 +1,69 @@
+--People are always confused about their medical insurance and don't know the cost of insurance at different ages and conditions.
+--This data is useful for these people and is useful to make predictions of the insurance cost they will have to pay.
+
+USE insurance;
+
+-- 1. Display the average claim amount for patients in each region.
+SELECT region,avg(claim) AS avg_claim 
+FROM insurance_data
+GROUP BY region;
+
+
+-- 2. Select the maximum and minimum BMI values in the table.
+SELECT MAX(bmi) AS max_bmi, 
+ min(bmi) AS min_bmi 
+FROM insurance_data;
+
+
+-- 3. Select the PatientID, age, and BMI for patients with a BMI between 40 and 50.
+
+SELECT PatientID,age,bmi 
+FROM insurance_data 
+WHERE bmi BETWEEN 40 and 50;
+
+
+-- 4. Select the number of smokers in each region.
+
+SELECT region,count(PatientID) 
+FROM insurance_data 
+WHERE smoker="Yes"
+GROUP BY region;
+
+
+-- 5. What is the average claim amount for patients who are both diabetic and smokers?
+
+SELECT AVG(claim) AS avg_claim 
+FROM insurance_data 
+WHERE diabetic="Yes" 
+AND smoker="Yes";
+
+
+-- 6. Retrieve all patients who have a BMI greater 
+-- than the average BMI of patients who are smokers.
+
+SELECT * 
+FROM insurance_data 
+WHERE smoker="Yes" 
+AND  bmi > (SELECT AVG(bmi) FROM insurance_data WHERE smoker="Yes");
+
+
+-- 7. Retrieve the top 3 patients with the highest claim amount, along with their 
+-- respective claim amounts and the total claim amount for all patients.
+
+SELECT PatientID, claim,sum(claim) over() AS total_claim 
+FROM insurance_data
+ORDER BY claim 
+DESC LIMIT 3;
+
+
+-- 8. Select the details of patients who have a claim amount 
+-- greater than the average claim amount for their region.
+
+SELECT * 
+FROM insurance_data t1
+WHERE claim > (SELECT avg(claim) FROM insurance_data t2 WHERE t2.region = t1.region);
+
+SELECT * 
+FROM (SELECT *, AVG(claim)  OVER(partition by region) AS avg_claim FROM insurance_data) AS subquery
+WHERE claim > avg_claim;
+
