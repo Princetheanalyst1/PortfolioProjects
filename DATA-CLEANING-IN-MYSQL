@@ -50,7 +50,7 @@ WHERE row_num > 1;
 -- WHERE company = 'Casper';
 -- Check each company has a duplicate
 
-
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 -- 2. Standardized the Data
@@ -100,7 +100,7 @@ SET `date` = STR_TO_DATE (`date`, '%m/%d/%Y');
 ALTER TABLE layoffs_staging
 MODIFY column `date` DATE;
 
-
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
 -- 3. Null values/Blank Values 
 
 SELECT *
@@ -129,7 +129,7 @@ SET t1.industry = t2.industry
 WHERE (t1.industry IS NULL OR t1.industry = '')
 AND t2.industry IS NOT NULL;
 
-
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
 -- 4. Remove any columns
 
 SELECT * 
