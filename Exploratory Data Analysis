@@ -1,0 +1,119 @@
+
+SELECT *
+FROM layoffs_staging;
+
+
+-- What is the highest total lay off in one day by a company
+-- And what was the percentage of the total company ? 
+
+
+SELECT
+MAX(total_laid_off), MAX(percentage_laid_off)
+FROM layoffs_staging;
+-- 12,000 laid and 100% of the company 
+-- The company went bust and probably shut down. 
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Are there more companies that went bust and lost all employees ? 
+
+SELECT *
+FROM layoffs_staging
+WHERE percentage_laid_off = '1';
+
+-- This shows all the companies where 100% of the staff were laid off. 
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+-- Which company had the highest total laid off ? 
+
+SELECT *
+FROM layoffs_staging
+WHERE percentage_laid_off = '1'
+ORDER BY total_laid_off DESC;
+
+-- Katerra had 2434 staff laid off which is the highest in the data. 
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+-- Find out what years which data is conducted between ?
+-- And which company let off the most amount of staff within this period?
+-- What could the reason be ? 
+
+SELECT MIN(date), MAX(date)
+FROM layoffs_staging;
+
+SELECT company, SUM(total_laid_off)
+FROM layoffs_staging
+GROUP BY company
+ORDER BY 2 DESC;
+
+-- This shows between the years 2020-03-11 AND 2023-03-06 
+-- Amazon had the highest laid off in this data of 18,150 people.]
+-- These dates are when COVID started and ended. 
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- What industry got hit the most in this period ? 
+
+SELECT industry, SUM(total_laid_off)
+FROM layoffs_staging
+GROUP BY industry
+ORDER BY 2 DESC;
+
+-- Consumer industry was hit the hardest and Manufactoring the lowest
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+-- Country with highest laid off ? 
+-- Which year have the highest laid off ?
+
+SELECT country, SUM(total_laid_off)
+FROM layoffs_staging
+GROUP BY country
+ORDER BY 2 DESC;
+
+SELECT YEAR(DATE), SUM(total_laid_off)
+FROM layoffs_staging
+GROUP BY YEAR(DATE)
+ORDER BY 1 DESC;
+
+-- United States had the highet followed by Inida.
+-- They also have a very high population compared to the rest. 
+-- 2023
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- How much were companies  laying off per year 
+
+SELECT company, SUM(total_laid_off)
+FROM layoffs_staging
+GROUP BY company
+ORDER BY 2 DESC;
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Rank total to see who laid off the most people per year 
+--  Top 5 only 
+ 
+SELECT company, YEAR(date),
+SUM(total_laid_off)
+FROM layoffs_staging
+GROUP BY company, YEAR(date)
+order by 3 DESC;
+
+
+WITH Company_year  (Company, years, total_laid_off) AS 
+(
+SELECT company, YEAR(date),
+SUM(total_laid_off)
+FROM layoffs_staging
+GROUP BY company, YEAR(date)
+), Company_year_rank AS 
+(SELECT *, DENSE_RANK() OVER (PARTITION BY years ORDER BY total_laid_off DESC) AS RANKING
+FROM Company_year
+WHERE years IS NOT NULL
+)
+SELECT *
+FROM company_year_rank
+WHERE Ranking <= 5;
